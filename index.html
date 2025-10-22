@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>John AI Assistant - Personal Learning & Research Helper</title>
+    <title>John AI Assistant - CV Selection Helper</title>
     <link href="https://cdn.jsdelivr.net/npm/@n8n/chat/dist/style.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -289,6 +289,383 @@
             color: rgba(255, 255, 255, 0.7);
         }
 
+        /* Chat Controls */
+        .chat-controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .chat-btn {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(76, 220, 196, 0.3);
+        }
+
+        .chat-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(76, 220, 196, 0.4);
+        }
+
+        .chat-btn.secondary {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .chat-btn.secondary:hover {
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.4);
+        }
+
+        /* Fullscreen Chat */
+        .fullscreen-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(15px);
+            z-index: 10000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .fullscreen-overlay.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { 
+                opacity: 0;
+                backdrop-filter: blur(0px);
+            }
+            to { 
+                opacity: 1;
+                backdrop-filter: blur(15px);
+            }
+        }
+
+        .fullscreen-chat {
+            width: 95%;
+            max-width: 900px;
+            height: 90%;
+            max-height: 800px;
+            background: white;
+            border-radius: 25px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.6);
+            animation: slideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 2px solid rgba(76, 220, 196, 0.3);
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0;
+                transform: scale(0.7) translateY(100px) rotateX(10deg); 
+            }
+            to { 
+                opacity: 1;
+                transform: scale(1) translateY(0) rotateX(0deg); 
+            }
+        }
+
+        .fullscreen-header {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d, #2c3e50);
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .fullscreen-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300"><polygon fill="%23ffffff10" points="0,0 1000,50 1000,300 0,250"/></svg>');
+            pointer-events: none;
+        }
+
+        .fullscreen-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 2;
+            position: relative;
+        }
+
+        .fullscreen-title i {
+            animation: robotPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes robotPulse {
+            0%, 100% { 
+                transform: scale(1);
+                color: white;
+            }
+            50% { 
+                transform: scale(1.1);
+                color: #ffeb3b;
+            }
+        }
+
+        .close-fullscreen {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1.1rem;
+            z-index: 2;
+            position: relative;
+        }
+
+        .close-fullscreen:hover {
+            background: rgba(255, 107, 107, 0.8);
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .fullscreen-chat-content {
+            height: calc(100% - 80px);
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(145deg, #f8f9fa 0%, #e9ecef 100%);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Fullscreen chat iframe styling */
+        .fullscreen-chat-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+            flex: 1;
+        }
+
+        /* Custom chat widget for fullscreen */
+        .fullscreen-chat-widget {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        .chat-header-custom {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .chat-messages-area {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .chat-input-area {
+            padding: 1rem;
+            background: white;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 25px;
+            outline: none;
+            font-size: 1rem;
+        }
+
+        .chat-input-area input:focus {
+            border-color: #4ecdc4;
+            box-shadow: 0 0 0 3px rgba(76, 220, 196, 0.1);
+        }
+
+        .chat-send-btn {
+            background: #4ecdc4;
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .chat-send-btn:hover {
+            background: #44a08d;
+            transform: scale(1.1);
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 20px;
+            margin-bottom: 0.5rem;
+            animation: messageSlide 0.3s ease-out;
+        }
+
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            background: #4ecdc4;
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .message.bot {
+            background: white;
+            color: #333;
+            border: 1px solid #e9ecef;
+            align-self: flex-start;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            font-style: italic;
+            margin: 0.5rem 0;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 3px;
+        }
+
+        .typing-dots span {
+            width: 6px;
+            height: 6px;
+            background: #4ecdc4;
+            border-radius: 50%;
+            animation: typingBounce 1.4s infinite ease-in-out;
+        }
+
+        .typing-dots span:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dots span:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typingBounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Enhanced fullscreen animations */
+        .fullscreen-overlay.active .fullscreen-chat {
+            animation: enhancedSlideIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes enhancedSlideIn {
+            0% { 
+                opacity: 0;
+                transform: scale(0.6) translateY(200px) rotateY(15deg);
+                filter: blur(10px);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(0.9) translateY(50px) rotateY(5deg);
+                filter: blur(2px);
+            }
+            100% { 
+                opacity: 1;
+                transform: scale(1) translateY(0) rotateY(0deg);
+                filter: blur(0px);
+            }
+        }
+
+        /* Loading indicator for fullscreen */
+        .fullscreen-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(76, 220, 196, 0.3);
+            border-top: 3px solid #4ecdc4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #4ecdc4;
+            font-weight: 600;
+            font-size: 1.1rem;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        /* Chat widget styling override */
+        .n8n-chat {
+            z-index: 1001 !important;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .nav-links {
@@ -310,11 +687,16 @@
             .features-grid {
                 grid-template-columns: 1fr;
             }
-        }
 
-        /* Chat widget styling override */
-        .n8n-chat {
-            z-index: 1001 !important;
+            .chat-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .fullscreen-chat {
+                width: 95%;
+                height: 95%;
+            }
         }
 
         .fadeInUp {
@@ -343,15 +725,15 @@
     <section class="hero" id="home">
         <div class="hero-content">
             <div class="profile-image">
-                <i class="fas fa-graduation-cap"></i>
+                <i class="fas fa-user-tie"></i>
             </div>
             
             <h1 class="hero-title">John AI Assistant</h1>
-            <h2 class="hero-subtitle">Asisten Pribadi untuk Pembelajaran & Penelitian</h2>
+            <h2 class="hero-subtitle">Your Smart CV Selection Helper</h2>
             <p class="hero-description">
-                Halo! Saya John, asisten AI pribadi yang siap membantu Anda dalam perjalanan pembelajaran dan penelitian. 
-                Dengan teknologi AI terdepan, saya dapat membantu Anda memahami mata kuliah, mencari referensi penelitian, 
-                memberikan rekomendasi sumber pembelajaran, dan mendampingi Anda dalam mencapai tujuan akademik.
+                Halo! Saya John, asisten AI yang siap membantu Anda dalam proses seleksi CV dan rekrutmen. 
+                Dengan teknologi AI terdepan, saya dapat menganalisis CV, memberikan rekomendasi kandidat terbaik, 
+                dan membantu proses hiring Anda menjadi lebih efisien dan akurat.
             </p>
 
             <!-- CTA Section -->
@@ -360,32 +742,43 @@
                     <div class="chat-icon">
                         <i class="fas fa-comments"></i>
                     </div>
-                    <h3>💬 Mulai Pembelajaran Bersama</h3>
-                    <p>Klik salah satu topik di bawah atau mulai chat langsung untuk mendapatkan bantuan dalam pembelajaran dan penelitian Anda!</p>
+                    <h3>💬 Mulai Konsultasi CV</h3>
+                    <p>Klik salah satu topik di bawah atau pilih mode chat yang Anda inginkan untuk mendapatkan bantuan dalam proses seleksi CV Anda!</p>
+
+                    <div class="chat-controls">
+                        <button class="chat-btn" onclick="openRegularChat()" title="Buka chat dalam mode widget">
+                            <i class="fas fa-comment"></i>
+                            Chat Normal
+                        </button>
+                        <button class="chat-btn secondary" onclick="openFullscreenChat()" title="Buka chat fullscreen (Ctrl+Enter)">
+                            <i class="fas fa-expand"></i>
+                            Chat Fullscreen
+                        </button>
+                    </div>
                     
                     <div class="chat-examples">
-                        <div class="example-card" onclick="openChatWithMessage('Bantu saya memahami konsep matematika yang sulit')">
-                            <i class="fas fa-calculator"></i>
-                            <h4>Bantuan Mata Kuliah</h4>
-                            <p>Dapatkan penjelasan detail tentang konsep-konsep sulit dalam berbagai mata kuliah</p>
+                        <div class="example-card" onclick="openChatWithMessage('Bagaimana cara menganalisis CV yang baik?')">
+                            <i class="fas fa-file-alt"></i>
+                            <h4>Analisis CV</h4>
+                            <p>Pelajari cara menganalisis dan mengevaluasi CV kandidat secara efektif</p>
                         </div>
                         
-                        <div class="example-card" onclick="openChatWithMessage('Carikan referensi jurnal untuk penelitian saya tentang teknologi')">
-                            <i class="fas fa-search"></i>
-                            <h4>Pencarian Referensi</h4>
-                            <p>Temukan sumber referensi yang relevan dan berkualitas untuk penelitian Anda</p>
+                        <div class="example-card" onclick="openChatWithMessage('Apa kriteria kandidat yang ideal untuk posisi ini?')">
+                            <i class="fas fa-user-check"></i>
+                            <h4>Kriteria Kandidat</h4>
+                            <p>Tentukan kriteria dan kualifikasi ideal untuk posisi yang tersedia</p>
                         </div>
                         
-                        <div class="example-card" onclick="openChatWithMessage('Bagaimana cara membuat ringkasan yang efektif?')">
-                            <i class="fas fa-book-open"></i>
-                            <h4>Teknik Belajar</h4>
-                            <p>Pelajari metode dan teknik belajar yang efektif untuk meningkatkan pemahaman</p>
+                        <div class="example-card" onclick="openChatWithMessage('Bagaimana proses screening CV yang efisien?')">
+                            <i class="fas fa-filter"></i>
+                            <h4>Screening Process</h4>
+                            <p>Optimalisasi proses screening untuk mendapatkan kandidat terbaik</p>
                         </div>
                         
-                        <div class="example-card" onclick="openChatWithMessage('Rekomendasi buku dan materi untuk memperdalam ilmu data')">
-                            <i class="fas fa-lightbulb"></i>
-                            <h4>Rekomendasi Sumber</h4>
-                            <p>Dapatkan rekomendasi buku, course, dan materi terbaik sesuai kebutuhan Anda</p>
+                        <div class="example-card" onclick="openChatWithMessage('Tips wawancara dan evaluasi kandidat')">
+                            <i class="fas fa-comments-dollar"></i>
+                            <h4>Interview Tips</h4>
+                            <p>Dapatkan panduan wawancara dan teknik evaluasi kandidat</p>
                         </div>
                     </div>
                 </div>
@@ -400,50 +793,50 @@
             <div class="features-grid">
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <i class="fas fa-brain"></i>
+                        <i class="fas fa-search"></i>
                     </div>
-                    <h3>Smart Learning Assistant</h3>
-                    <p>Penjelasan konsep yang mudah dipahami dengan pendekatan yang disesuaikan dengan gaya belajar Anda.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-database"></i>
-                    </div>
-                    <h3>Comprehensive Research</h3>
-                    <p>Akses ke berbagai sumber referensi berkualitas dan bantuan dalam menyusun daftar pustaka yang kredibel.</p>
-                </div>
-                
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-clock"></i>
-                    </div>
-                    <h3>24/7 Availability</h3>
-                    <p>Bantuan pembelajaran kapan saja Anda butuhkan, tanpa terbatas waktu dan tempat.</p>
+                    <h3>Smart CV Analysis</h3>
+                    <p>Analisis CV secara cerdas dengan AI untuk mengidentifikasi kandidat potensial berdasarkan kriteria spesifik.</p>
                 </div>
                 
                 <div class="feature-card">
                     <div class="feature-icon">
                         <i class="fas fa-chart-line"></i>
                     </div>
-                    <h3>Progress Tracking</h3>
-                    <p>Pantau perkembangan pembelajaran Anda dan dapatkan saran untuk meningkatkan efektivitas belajar.</p>
+                    <h3>Candidate Ranking</h3>
+                    <p>Sistem scoring otomatis yang memberikan ranking kandidat berdasarkan kesesuaian dengan posisi yang dibutuhkan.</p>
                 </div>
                 
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <i class="fas fa-users"></i>
+                        <i class="fas fa-clock"></i>
                     </div>
-                    <h3>Multi-Subject Support</h3>
-                    <p>Dukungan untuk berbagai bidang studi dari sains, teknologi, hingga humaniora dan sosial.</p>
+                    <h3>Time Efficiency</h3>
+                    <p>Proses seleksi yang lebih cepat dan efisien, menghemat waktu HR hingga 70% dari proses manual.</p>
                 </div>
                 
                 <div class="feature-card">
                     <div class="feature-icon">
-                        <i class="fas fa-graduation-cap"></i>
+                        <i class="fas fa-target"></i>
                     </div>
-                    <h3>Academic Excellence</h3>
-                    <p>Panduan praktis untuk mencapai prestasi akademik terbaik dengan strategi pembelajaran yang tepat.</p>
+                    <h3>Precision Matching</h3>
+                    <p>Matching precision tinggi antara requirement pekerjaan dengan background dan skill kandidat.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Bias-Free Selection</h3>
+                    <p>Eliminasi bias dalam proses seleksi dengan standar evaluasi yang objektif dan konsisten.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>Continuous Learning</h3>
+                    <p>Sistem yang terus belajar dari feedback dan data untuk meningkatkan akurasi rekomendasi.</p>
                 </div>
             </div>
         </div>
@@ -452,58 +845,228 @@
     <!-- Footer -->
     <footer class="footer" id="contact">
         <p>&copy; 2025 John AI Assistant. Powered by Advanced AI Technology.</p>
-        <p>Your Partner in Learning & Research • Start learning now!</p>
+        <p>Your Partner in Smart Recruitment • Start chatting now!</p>
     </footer>
+
+    <!-- Fullscreen Chat Overlay -->
+    <div class="fullscreen-overlay" id="fullscreenOverlay">
+        <div class="fullscreen-chat">
+            <div class="fullscreen-header">
+                <div class="fullscreen-title">
+                    <i class="fas fa-robot"></i>
+                    John AI Assistant - Fullscreen Mode
+                </div>
+                <button class="close-fullscreen" onclick="closeFullscreenChat()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="fullscreen-chat-content" id="fullscreenChatContent">
+                <!-- Custom fullscreen chat widget will be loaded here -->
+                <div class="fullscreen-chat-widget" id="fullscreenChatWidget" style="display: none;">
+                    <div class="chat-header-custom">
+                        <i class="fas fa-robot"></i> John AI Assistant - CV Selection Helper
+                    </div>
+                    <div class="chat-messages-area" id="chatMessages">
+                        <div class="message bot">
+                            <i class="fas fa-robot" style="margin-right: 8px; color: #4ecdc4;"></i>
+                            Hi there! 👋 Welcome to fullscreen mode!
+                        </div>
+                        <div class="message bot">
+                            My name is John. How can I assist you with CV selection today?
+                        </div>
+                        <div class="message bot">
+                            🚀 Enjoy the enhanced fullscreen experience with better visibility and interaction!
+                        </div>
+                    </div>
+                    <div class="typing-indicator" id="typingIndicator">
+                        <div class="typing-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        John is typing...
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chatInput" placeholder="Type your message here..." maxlength="500">
+                        <button class="chat-send-btn" id="chatSendBtn">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- N8N Chat Widget -->
     <script type="module">
         import { createChat } from 'https://cdn.jsdelivr.net/npm/@n8n/chat/dist/chat.bundle.es.js';
 
+        // Regular chat instance
         window.chatInstance = createChat({
-            webhookUrl: 'https://n8n-deax7yimgqyu.axwy.sumopod.my.id/webhook/286bf5ce-2090-40dc-972a-308d2bed5465/chat',
+            webhookUrl: 'https://n8n-w0kfee8uiagq.arman.sumopod.my.id/webhook/286bf5ce-2090-40dc-972a-308d2bed5465/chat',
             initialMessages: [
                 'Hi there! 👋',
-                'My name is John. How can I assist you with your learning and research today?'
+                'My name is John. How can I assist you today?'
             ],
             i18n: {
                 en: {
                     title: 'Hi there! 👋',
-                    subtitle: "Your Personal Learning & Research Assistant",
+                    subtitle: "Your Assistant to help you get a better person",
                     footer: '',
                     getStarted: 'New Conversation',
                     inputPlaceholder: 'Type your question..',
                 },
+            },
+            theme: {
+                primaryColor: '#4ecdc4',
+                textColor: '#333',
+                backgroundColor: 'rgba(255, 255, 255, 0.95)',
             }
         });
 
-        // Function to open chat with predefined message
-        window.openChatWithMessage = function(message) {
-            // Try to find and click the chat button
-            setTimeout(() => {
-                const chatWidget = document.querySelector('n8n-chat');
-                if (chatWidget && chatWidget.shadowRoot) {
-                    const chatButton = chatWidget.shadowRoot.querySelector('button');
-                    if (chatButton) {
-                        chatButton.click();
-                        
-                        // Wait for chat to open and send message
-                        setTimeout(() => {
-                            const chatInput = chatWidget.shadowRoot.querySelector('input[type="text"]');
-                            if (chatInput) {
-                                chatInput.value = message;
-                                chatInput.dispatchEvent(new Event('input', { bubbles: true }));
-                                
-                                // Find and click send button
-                                const sendButton = chatWidget.shadowRoot.querySelector('button[type="submit"]');
-                                if (sendButton) {
-                                    sendButton.click();
-                                }
-                            }
-                        }, 1000);
-                    }
+        // Fullscreen chat instance
+        let fullscreenChatInstance = null;
+
+        // Function to open regular chat
+        window.openRegularChat = function() {
+            const chatWidget = document.querySelector('n8n-chat');
+            if (chatWidget && chatWidget.shadowRoot) {
+                const chatButton = chatWidget.shadowRoot.querySelector('button');
+                if (chatButton) {
+                    chatButton.click();
                 }
-            }, 100);
+            }
         };
+
+        // Function to open fullscreen chat
+        window.openFullscreenChat = function() {
+            const overlay = document.getElementById('fullscreenOverlay');
+            const content = document.getElementById('fullscreenChatContent');
+            
+            // Show overlay
+            overlay.classList.add('active');
+            
+            // Show loading indicator
+            content.innerHTML = `
+                <div class="fullscreen-loading">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Memuat Chat Fullscreen...</div>
+                </div>
+            `;
+            
+            // Create fullscreen chat instance if it doesn't exist
+            setTimeout(() => {
+                if (!fullscreenChatInstance) {
+                    fullscreenChatInstance = createChat({
+                        target: '#fullscreenChatContent',
+                        mode: 'window',
+                        webhookUrl: 'https://n8n-deax7yimgqyu.axwy.sumopod.my.id/webhook/286bf5ce-2090-40dc-972a-308d2bed5465/chat',
+                        initialMessages: [
+                            'Hi there! 👋',
+                            'Welcome to fullscreen mode! My name is John. How can I assist you with CV selection today?',
+                            '🚀 Enjoy the enhanced chat experience!'
+                        ],
+                        width: '100%',
+                        height: '100%',
+                        i18n: {
+                            en: {
+                                title: 'John AI Assistant - Fullscreen',
+                                subtitle: "Enhanced chat experience for better CV consultation",
+                                footer: 'Fullscreen mode • Press ESC to exit',
+                                getStarted: 'Start Conversation',
+                                inputPlaceholder: 'Type your message here...',
+                            },
+                        },
+                        theme: {
+                            primaryColor: '#4ecdc4',
+                            textColor: '#333',
+                            backgroundColor: '#ffffff',
+                            borderRadius: '0px',
+                        }
+                    });
+                } else {
+                    // If instance exists, just clear loading and show chat
+                    content.innerHTML = '';
+                    content.appendChild(fullscreenChatInstance.element || document.createElement('div'));
+                }
+            }, 800);
+        };
+
+        // Function to close fullscreen chat
+        window.closeFullscreenChat = function() {
+            const overlay = document.getElementById('fullscreenOverlay');
+            fullscreenChatActive = false;
+            overlay.classList.remove('active');
+        };
+
+        // Function to open chat with predefined message (enhanced for fullscreen)
+        window.openChatWithMessage = function(message) {
+            // Check if user prefers fullscreen (you could add user preference storage here)
+            const useFullscreen = window.innerWidth > 768; // Use fullscreen on larger screens
+            
+            if (useFullscreen) {
+                openFullscreenChat();
+                
+                // Send message to fullscreen chat after it loads
+                setTimeout(() => {
+                    if (fullscreenChatActive) {
+                        const chatInput = document.getElementById('chatInput');
+                        const chatSendBtn = document.getElementById('chatSendBtn');
+                        
+                        if (chatInput && chatSendBtn) {
+                            chatInput.value = message;
+                            chatSendBtn.click();
+                        }
+                    }
+                }, 1500);
+            } else {
+                // Use regular chat for mobile
+                openRegularChat();
+                
+                setTimeout(() => {
+                    const chatWidget = document.querySelector('n8n-chat');
+                    if (chatWidget && chatWidget.shadowRoot) {
+                        const chatInput = chatWidget.shadowRoot.querySelector('input[type="text"]');
+                        if (chatInput) {
+                            chatInput.value = message;
+                            chatInput.dispatchEvent(new Event('input', { bubbles: true }));
+                            
+                            const sendButton = chatWidget.shadowRoot.querySelector('button[type="submit"]');
+                            if (sendButton) {
+                                sendButton.click();
+                            }
+                        }
+                    }
+                }, 1000);
+            }
+        };
+
+        // Enhanced keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Escape to close fullscreen
+            if (e.key === 'Escape') {
+                closeFullscreenChat();
+            }
+            
+            // Ctrl/Cmd + Enter to open fullscreen chat
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                openFullscreenChat();
+            }
+            
+            // F11 alternative - Ctrl/Cmd + Shift + F for fullscreen
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'F') {
+                e.preventDefault();
+                openFullscreenChat();
+            }
+        });
+
+        // Close fullscreen when clicking outside
+        document.getElementById('fullscreenOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeFullscreenChat();
+            }
+        });
 
         // Add click handlers for smooth scrolling
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -542,10 +1105,13 @@
                 transition: transform 0.3s ease;
                 backdrop-filter: blur(10px);
                 border: 1px solid rgba(255,255,255,0.2);
+                max-width: 320px;
             `;
             notification.innerHTML = `
                 <i class="fas fa-robot" style="margin-right: 10px;"></i>
-                John AI Assistant siap membantu pembelajaran Anda!
+                John AI Assistant siap membantu!<br>
+                <small style="opacity: 0.9;">🚀 Coba mode fullscreen untuk pengalaman chat yang lebih baik</small><br>
+                <small style="opacity: 0.8; font-size: 0.8rem;">💡 Shortcut: Ctrl+Enter untuk fullscreen</small>
             `;
             document.body.appendChild(notification);
 
@@ -556,9 +1122,72 @@
             setTimeout(() => {
                 notification.style.transform = 'translateX(400px)';
                 setTimeout(() => notification.remove(), 300);
-            }, 4000);
+            }, 6000);
         }, 2000);
+
+        // Add some helper functions for better UX
+        function showNotification(message, type = 'info', duration = 3000) {
+            const notification = document.createElement('div');
+            const colors = {
+                info: 'linear-gradient(45deg, #4ecdc4, #44a08d)',
+                success: 'linear-gradient(45deg, #96ceb4, #a8e6cf)',
+                warning: 'linear-gradient(45deg, #ffeb3b, #ffc107)',
+                error: 'linear-gradient(45deg, #ff6b6b, #ee5a52)'
+            };
+            
+            notification.style.cssText = `
+                position: fixed;
+                top: 120px;
+                right: 20px;
+                background: ${colors[type]};
+                color: ${type === 'warning' ? '#333' : 'white'};
+                padding: 12px 20px;
+                border-radius: 8px;
+                z-index: 10001;
+                box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+                transform: translateX(400px);
+                transition: transform 0.3s ease;
+                font-size: 0.9rem;
+                max-width: 300px;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => notification.style.transform = 'translateX(0)', 100);
+            setTimeout(() => {
+                notification.style.transform = 'translateX(400px)';
+                setTimeout(() => notification.remove(), 300);
+            }, duration);
+        }
+
+        // Enhanced example card interactions
+        document.querySelectorAll('.example-card').forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.1}s`;
+            card.classList.add('fadeInUp');
+            
+            // Add click feedback
+            card.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+                
+                showNotification('Membuka chat dengan topik: ' + this.querySelector('h4').textContent, 'info', 2000);
+            });
+        });
+
+        // Add fullscreen button pulse effect
+        const fullscreenBtn = document.querySelector('.chat-btn.secondary');
+        if (fullscreenBtn) {
+            setInterval(() => {
+                if (!fullscreenChatActive) {
+                    fullscreenBtn.style.animation = 'pulse 0.8s ease-in-out';
+                    setTimeout(() => {
+                        fullscreenBtn.style.animation = '';
+                    }, 800);
+                }
+            }, 8000);
+        }
     </script>
 </body>
 </html>
-
